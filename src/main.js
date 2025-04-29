@@ -3,7 +3,7 @@ import "./style.css";
 const draggableElement = document.querySelector(".draggable");
 const dropZones = document.querySelectorAll(".dropzone");
 draggableElement.addEventListener("mousedown", handleMouseDown);
-const handleMouseDown = (e) => {
+function handleMouseDown(e) {
   const mouseStartPosition = { x: e.clientX, y: e.clientY };
   // get initial position of draggable
   const { left: elementStartX, top: elementStartY } =
@@ -17,7 +17,7 @@ const handleMouseDown = (e) => {
   // change to absolute to make it draggable and z-index to move it to the top
   draggableElement.style.position = "absolute";
   draggableElement.style.zIndex = 1000;
-  let activeDropZone = null;
+  let activeDropZone = draggableElement.closest(".dropzone");
 
   const handleMouseMove = (e) => {
     // calculate how much the mouse has moved and add it
@@ -27,18 +27,9 @@ const handleMouseDown = (e) => {
     draggableElement.style.left = `${elementStartX + deltaX}px`;
     draggableElement.style.top = `${elementStartY + deltaY}px`;
 
-    // we need to get the new positions of the draggable element
-    const draggableRect = draggableElement.getBoundingClientRect();
     dropZones.forEach((dropZone) => {
-      // calculate the overlap area between the draggable and the dropzone
-      // if the overlap area is greater than half of the draggable or dropzone
-      // then we change the draggable size
       const dropZoneRect = dropZone.getBoundingClientRect();
-      const overlapArea = getOverlapArea(draggableRect, dropZoneRect);
-      if (
-        overlapArea > draggableRect.width * draggableRect.height * 0.5 ||
-        overlapArea > dropZoneRect.width * dropZoneRect.height * 0.5
-      ) {
+      if (isMouseHoveringElement({ x: e.clientX, y: e.clientY }, dropZone)) {
         draggableElement.style.height = `${dropZoneRect.height}px`;
         draggableElement.style.width = `${dropZoneRect.width}px`;
         activeDropZone = dropZone;
@@ -69,16 +60,14 @@ const handleMouseDown = (e) => {
 
   document.addEventListener("mousemove", handleMouseMove);
   document.addEventListener("mouseup", handleMouseUp);
-};
+}
 
-function getOverlapArea(rect1, rect2) {
-  const xOverlap = Math.max(
-    0,
-    Math.min(rect1.right, rect2.right) - Math.max(rect1.left, rect2.left),
+function isMouseHoveringElement({ x, y }, element) {
+  const rect = element.getBoundingClientRect();
+  return (
+    x >= rect.left &&
+    x <= rect.right &&
+    y >= rect.top &&
+    y <= rect.bottom
   );
-  const yOverlap = Math.max(
-    0,
-    Math.min(rect1.bottom, rect2.bottom) - Math.max(rect1.top, rect2.top),
-  );
-  return xOverlap * yOverlap;
 }

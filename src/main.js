@@ -2,10 +2,12 @@ import "./style.css";
 
 const draggableElement = document.querySelector(".draggable");
 const dropZones = document.querySelectorAll(".dropzone");
+draggableElement.addEventListener("mousedown", handleMouseDown);
 const handleMouseDown = (e) => {
   const mouseStartPosition = { x: e.clientX, y: e.clientY };
   // get initial position of draggable
-  const { left: elementStartX, top: elementStartY } = draggableElement.getBoundingClientRect();
+  const { left: elementStartX, top: elementStartY } =
+    draggableElement.getBoundingClientRect();
   const originalStyles = {
     position: draggableElement.style.position,
     zIndex: draggableElement.style.zIndex,
@@ -25,19 +27,21 @@ const handleMouseDown = (e) => {
     draggableElement.style.left = `${elementStartX + deltaX}px`;
     draggableElement.style.top = `${elementStartY + deltaY}px`;
 
-    // calculate the overlap area between the draggable and the dropzones
+    // we need to get the new positions of the draggable element
     const draggableRect = draggableElement.getBoundingClientRect();
-    const draggableArea = draggableRect.width * draggableRect.height;
     dropZones.forEach((dropZone) => {
+      // calculate the overlap area between the draggable and the dropzone
+      // if the overlap area is greater than half of the draggable or dropzone
+      // then we change the draggable size
       const dropZoneRect = dropZone.getBoundingClientRect();
       const overlapArea = getOverlapArea(draggableRect, dropZoneRect);
-
-      if (overlapArea > draggableArea * 0.5) {
+      if (
+        overlapArea > draggableRect.width * draggableRect.height * 0.5 ||
+        overlapArea > dropZoneRect.width * dropZoneRect.height * 0.5
+      ) {
         draggableElement.style.height = `${dropZoneRect.height}px`;
         draggableElement.style.width = `${dropZoneRect.width}px`;
         activeDropZone = dropZone;
-      } else {
-        draggableElement.style.backgroundColor = "";
       }
     });
   };
@@ -66,7 +70,6 @@ const handleMouseDown = (e) => {
   document.addEventListener("mousemove", handleMouseMove);
   document.addEventListener("mouseup", handleMouseUp);
 };
-draggableElement.addEventListener("mousedown", handleMouseDown);
 
 function getOverlapArea(rect1, rect2) {
   const xOverlap = Math.max(

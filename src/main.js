@@ -6,13 +6,13 @@ draggableElement.addEventListener("mousedown", handleMouseDown);
 function handleMouseDown(e) {
   const mouseStartPosition = { x: e.clientX, y: e.clientY };
   // get initial position of draggable
-  const { left: elementStartX, top: elementStartY } =
-    draggableElement.getBoundingClientRect();
+  const {
+    left: elementStartX,
+    top: elementStartY,
+  } = draggableElement.getBoundingClientRect();
   const originalStyles = {
     position: draggableElement.style.position,
     zIndex: draggableElement.style.zIndex,
-    width: draggableElement.style.width,
-    height: draggableElement.style.height,
   };
   // change to absolute to make it draggable and z-index to move it to the top
   draggableElement.style.position = "absolute";
@@ -33,7 +33,7 @@ function handleMouseDown(e) {
         { x: e.clientX, y: e.clientY },
         dropZoneRect,
       );
-      if (isMouseHoveringDropZone) {
+      if (isMouseHoveringDropZone && activeDropZone !== dropZone) {
         draggableElement.style.height = `${dropZoneRect.height}px`;
         draggableElement.style.width = `${dropZoneRect.width}px`;
         activeDropZone = dropZone;
@@ -44,22 +44,12 @@ function handleMouseDown(e) {
   const handleMouseUp = () => {
     document.removeEventListener("mousemove", handleMouseMove);
     document.removeEventListener("mouseup", handleMouseUp);
-    // reset the position and z-index
+    const { left, top } = activeDropZone.getBoundingClientRect();
     draggableElement.style.position = originalStyles.position;
     draggableElement.style.zIndex = originalStyles.zIndex;
-    // if dropZone is found, append the draggable to the dropZone,
-    // otherwise, reset the position
-    if (activeDropZone) {
-      const { left, top } = activeDropZone.getBoundingClientRect();
-      draggableElement.style.left = `${left}px`;
-      draggableElement.style.top = `${top}px`;
-      activeDropZone.appendChild(draggableElement);
-    } else {
-      draggableElement.style.left = `${elementStartX}px`;
-      draggableElement.style.top = `${elementStartY}px`;
-      draggableElement.style.width = originalStyles.width;
-      draggableElement.style.height = originalStyles.height;
-    }
+    draggableElement.style.left = `${left}px`;
+    draggableElement.style.top = `${top}px`;
+    activeDropZone.appendChild(draggableElement);
   };
 
   document.addEventListener("mousemove", handleMouseMove);

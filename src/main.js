@@ -3,13 +3,17 @@ import "./style.css";
 const draggableElement = document.querySelector(".draggable");
 const dropZones = document.querySelectorAll(".dropzone");
 draggableElement.addEventListener("mousedown", handleMouseDown);
+
 function handleMouseDown(e) {
-  const mouseStartPosition = { x: e.clientX, y: e.clientY };
+  const mouse = {
+    previousX: e.clientX,
+    previousY: e.clientY,
+    currentX: e.clientX,
+    currentY: e.clientY,
+  };
   // get initial position of draggable
-  const {
-    left: elementStartX,
-    top: elementStartY,
-  } = draggableElement.getBoundingClientRect();
+  const { left: elementStartX, top: elementStartY } =
+    draggableElement.getBoundingClientRect();
   const originalStyles = {
     position: draggableElement.style.position,
     zIndex: draggableElement.style.zIndex,
@@ -20,12 +24,23 @@ function handleMouseDown(e) {
   let activeDropZone = draggableElement.closest(".dropzone");
 
   const handleMouseMove = (e) => {
+    mouse.previousX = mouse.currentX;
+    mouse.previousY = mouse.currentY;
+    mouse.currentX = e.clientX;
+    mouse.currentY = e.clientY;
+    // calculate relative mouse position within the draggable element
+    const draggableRect = draggableElement.getBoundingClientRect();
+    const relativeX =
+      (mouse.currentX - draggableRect.left) / draggableRect.width;
+    const relativeY =
+      (mouse.currentY - draggableRect.top) / draggableRect.height;
+
     // calculate how much the mouse has moved and add it
     // to the draggable's initial position
-    const deltaX = e.clientX - mouseStartPosition.x;
-    const deltaY = e.clientY - mouseStartPosition.y;
-    draggableElement.style.left = `${elementStartX + deltaX}px`;
-    draggableElement.style.top = `${elementStartY + deltaY}px`;
+    const deltaX = mouse.currentX - mouse.previousX;
+    const deltaY = mouse.currentY - mouse.previousY;
+    draggableElement.style.left = `${draggableRect.left + deltaX}px`;
+    draggableElement.style.top = `${draggableRect.top + deltaY}px`;
 
     dropZones.forEach((dropZone) => {
       const dropZoneRect = dropZone.getBoundingClientRect();
@@ -36,6 +51,13 @@ function handleMouseDown(e) {
       if (isMouseHoveringDropZone && activeDropZone !== dropZone) {
         draggableElement.style.height = `${dropZoneRect.height}px`;
         draggableElement.style.width = `${dropZoneRect.width}px`;
+
+        // Adjust position to maintain relative mouse position
+        const newLeft = mouse.currentX - relativeX * dropZoneRect.width;
+        const newTop = mouse.currentY - relativeY * dropZoneRect.height;
+        draggableElement.style.left = `${newLeft}px`;
+        draggableElement.style.top = `${newTop}px`;
+
         activeDropZone = dropZone;
       }
     });
@@ -51,7 +73,6 @@ function handleMouseDown(e) {
     draggableElement.style.top = `${top}px`;
     activeDropZone.appendChild(draggableElement);
   };
-
   document.addEventListener("mousemove", handleMouseMove);
   document.addEventListener("mouseup", handleMouseUp);
 }

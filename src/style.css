@@ -1,0 +1,23 @@
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: red;
+  margin-top: 60px;
+}
+
+.draggable {
+  background-color: red;
+  width: 100px;
+  height: 100px;
+  cursor: pointer;
+}
+
+.drag-zone {
+  width: 500px;
+  height: 500px;
+  position: absolute;
+  bottom: 0;
+  background-color: blue
+}

@@ -12,6 +12,7 @@
   width: 100px;
   height: 100px;
   cursor: pointer;
+  transition: width 0.2s, height 0.2s;
 }
 
 .dropzone {

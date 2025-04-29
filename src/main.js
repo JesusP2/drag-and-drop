@@ -29,7 +29,11 @@ function handleMouseDown(e) {
 
     dropZones.forEach((dropZone) => {
       const dropZoneRect = dropZone.getBoundingClientRect();
-      if (isMouseHoveringElement({ x: e.clientX, y: e.clientY }, dropZone)) {
+      const isMouseHoveringDropZone = checkIfMouseIsHoveringElement(
+        { x: e.clientX, y: e.clientY },
+        dropZoneRect,
+      );
+      if (isMouseHoveringDropZone) {
         draggableElement.style.height = `${dropZoneRect.height}px`;
         draggableElement.style.width = `${dropZoneRect.width}px`;
         activeDropZone = dropZone;
@@ -62,12 +66,11 @@ function handleMouseDown(e) {
   document.addEventListener("mouseup", handleMouseUp);
 }
 
-function isMouseHoveringElement({ x, y }, element) {
-  const rect = element.getBoundingClientRect();
+function checkIfMouseIsHoveringElement({ x, y }, elementRect) {
   return (
-    x >= rect.left &&
-    x <= rect.right &&
-    y >= rect.top &&
-    y <= rect.bottom
+    x >= elementRect.left &&
+    x <= elementRect.right &&
+    y >= elementRect.top &&
+    y <= elementRect.bottom
   );
 }

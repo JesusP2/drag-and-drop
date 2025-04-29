@@ -14,10 +14,17 @@
   cursor: pointer;
 }
 
-.drag-zone {
+.dropzone {
+  background-color: blue
+}
+
+.one {
   width: 500px;
   height: 500px;
-  position: absolute;
   bottom: 0;
-  background-color: blue
+}
+
+.two {
+  width: 100px;
+  height: 100px;
 }

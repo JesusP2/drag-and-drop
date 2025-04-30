@@ -11,19 +11,26 @@ function handleMouseDown(e) {
     currentX: e.clientX,
     currentY: e.clientY,
   };
-  // get initial position of draggable
-  const { left: elementStartX, top: elementStartY } =
-    draggableElement.getBoundingClientRect();
   const originalStyles = {
     position: draggableElement.style.position,
     zIndex: draggableElement.style.zIndex,
   };
-  // change to absolute to make it draggable and z-index to move it to the top
+
   draggableElement.style.position = "absolute";
   draggableElement.style.zIndex = 1000;
+
   let activeDropZone = draggableElement.closest(".dropzone");
 
-  const handleMouseMove = (e) => {
+  function handleMouseMove(e) {
+    if (
+      !checkIfMouseIsHoveringElement(
+        { x: e.clientX, y: e.clientY },
+        draggableElement.getBoundingClientRect(),
+      )
+    ) {
+      handleMouseUp();
+      return;
+    }
     mouse.previousX = mouse.currentX;
     mouse.previousY = mouse.currentY;
     mouse.currentX = e.clientX;
@@ -57,22 +64,21 @@ function handleMouseDown(e) {
         const newTop = mouse.currentY - relativeY * dropZoneRect.height;
         draggableElement.style.left = `${newLeft}px`;
         draggableElement.style.top = `${newTop}px`;
-
         activeDropZone = dropZone;
       }
     });
-  };
+  }
 
-  const handleMouseUp = () => {
+  function handleMouseUp() {
     document.removeEventListener("mousemove", handleMouseMove);
     document.removeEventListener("mouseup", handleMouseUp);
     const { left, top } = activeDropZone.getBoundingClientRect();
-    draggableElement.style.position = originalStyles.position;
-    draggableElement.style.zIndex = originalStyles.zIndex;
     draggableElement.style.left = `${left}px`;
     draggableElement.style.top = `${top}px`;
+    draggableElement.style.position = originalStyles.position;
+    draggableElement.style.zIndex = originalStyles.zIndex;
     activeDropZone.appendChild(draggableElement);
-  };
+  }
   document.addEventListener("mousemove", handleMouseMove);
   document.addEventListener("mouseup", handleMouseUp);
 }

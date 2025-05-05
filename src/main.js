@@ -43,8 +43,8 @@ function handleMouseDown(e) {
         draggableElement.style.left = `${targetLeft}px`;
         draggableElement.style.top = `${targetTop}px`;
         // recalculate offset based on new size and position
-        offsetX = e.pageX - newLeft;
-        offsetY = e.pageY - newTop;
+        offsetX = e.pageX - targetLeft;
+        offsetY = e.pageY - targetTop;
         activeDropZone = dropZone;
       }
     });
